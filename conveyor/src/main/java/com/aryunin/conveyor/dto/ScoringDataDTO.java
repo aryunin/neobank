@@ -1,7 +1,7 @@
 package com.aryunin.conveyor.dto;
 
-import com.aryunin.conveyor.dto.enums.Gender;
-import com.aryunin.conveyor.dto.enums.MaterialStatus;
+import com.aryunin.conveyor.entity.enums.Gender;
+import com.aryunin.conveyor.entity.enums.MaterialStatus;
 import com.aryunin.conveyor.util.MoneySerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

@@ -1,4 +1,4 @@
-package com.aryunin.conveyor.dto.enums;
+package com.aryunin.conveyor.entity.enums;
 
 public enum Position {
     WORKER,
