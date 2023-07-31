@@ -16,5 +16,5 @@ public class PaymentScheduleElement {
     private BigDecimal totalPayment;
     private BigDecimal interestPayment;
     private BigDecimal debtPayment;
-    private BigDecimal remainingDept;
+    private BigDecimal remainingDebt;
 }
