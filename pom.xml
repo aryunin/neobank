@@ -1,0 +1,27 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.2</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.aryunin</groupId>
+    <artifactId>neobank</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>neobank</name>
+    <description>project for neostudy</description>
+
+    <modules>
+        <module>conveyor</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
+</project>
