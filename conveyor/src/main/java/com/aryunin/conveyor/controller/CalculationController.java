@@ -18,7 +18,6 @@ public class CalculationController {
     public CreditDTO getCredit(
             @RequestBody @Valid ScoringDataDTO request
     ) {
-        // todo: exception
         return service.getCredit(request);
     }
 }
