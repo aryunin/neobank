@@ -1,8 +1,8 @@
 package com.aryunin.conveyor.dto;
 
-import com.aryunin.conveyor.util.EmploymentStatus;
+import com.aryunin.conveyor.entity.enums.EmploymentStatus;
 import com.aryunin.conveyor.util.MoneySerializer;
-import com.aryunin.conveyor.util.Position;
+import com.aryunin.conveyor.entity.enums.Position;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
