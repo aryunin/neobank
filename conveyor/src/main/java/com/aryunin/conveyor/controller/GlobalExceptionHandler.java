@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+// TODO common error response (for ex 404)
 @ControllerAdvice
 public class GlobalExceptionHandler {
     private Map<String, String> formatFieldErrors(List<FieldError> errors) {
