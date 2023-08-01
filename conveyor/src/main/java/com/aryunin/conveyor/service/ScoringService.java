@@ -7,6 +7,7 @@ import com.aryunin.conveyor.dto.enums.MaterialStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+// fixme check for division by null
 public interface ScoringService {
     BigDecimal getRate();
     BigDecimal getInsuranceRate();

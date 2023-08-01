@@ -45,7 +45,7 @@ public class ScoringDataDTO {
     @Pattern(regexp = "\\d{6}")
     private String passportNumber;
     @JsonFormat(pattern="yyyy-MM-dd")
-    @NotNull
+    @NotNull // TODO VALIDATE!!!
     private LocalDate passportIssueDate;
     @NotNull
     @Pattern(regexp = "\\d{3}-\\d{3}", message = "invalid passport issue branch format")
