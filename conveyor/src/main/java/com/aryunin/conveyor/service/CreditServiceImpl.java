@@ -27,27 +27,20 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public BigDecimal getRate(boolean isInsuranceEnabled, boolean isSalaryClient) {
-        BigDecimal result = new BigDecimal(baseRate.toString());
+        var result = new BigDecimal(baseRate.toString());
         if(isInsuranceEnabled) result =  result.subtract(new BigDecimal("3.0"));
         if(isSalaryClient) result = result.subtract(new BigDecimal("1.0"));
         return result;
     }
 
     @Override
-    public BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term) {
+    public BigDecimal getMonthlyPayment(BigDecimal amount, BigDecimal rate, Integer term) {
         var rpm = getNormalRate(rate);
-        var x = totalAmount.multiply(rpm);
+        var x = amount.multiply(rpm);
         var y = new BigDecimal(1).add(rpm).pow(term);
         y = new BigDecimal(1).divide(y, scale, RoundingMode.HALF_UP);
         y = new BigDecimal(1).subtract(y);
         return x.divide(y, scale, RoundingMode.HALF_UP);
-    }
-
-    @Override
-    public BigDecimal getInsuranceAmount(BigDecimal amount) {
-        return amount
-                .multiply(insuranceRate)
-                .divide(new BigDecimal("100"), scale, RoundingMode.HALF_UP);
     }
 
     @Override
@@ -65,13 +58,13 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public List<PaymentScheduleElement> getPaymentSchedule(
             LocalDate startDate,
-            BigDecimal totalAmount,
+            BigDecimal amount,
             BigDecimal rate,
             Integer term) {
         var result = new ArrayList<PaymentScheduleElement>();
-        var remainingDebt = totalAmount;
+        var remainingDebt = amount;
         var currentDate = startDate;
-        var monthlyPayment = getMonthlyPayment(totalAmount, rate, term);
+        var monthlyPayment = getMonthlyPayment(amount, rate, term);
         var normalRate = getNormalRate(rate);
 
         for(var i = 0; i < term; i++) {
@@ -98,5 +91,11 @@ public class CreditServiceImpl implements CreditService {
 
     private BigDecimal getNormalRate(BigDecimal percentRate) {
         return percentRate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal getInsuranceAmount(BigDecimal amount) {
+        return amount
+                .multiply(insuranceRate)
+                .divide(new BigDecimal("100"), scale, RoundingMode.HALF_UP);
     }
 }

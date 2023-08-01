@@ -1,4 +1,4 @@
-package com.aryunin.conveyor.service;
+package com.aryunin.conveyor.service.calculation;
 
 import com.aryunin.conveyor.dto.CreditDTO;
 import com.aryunin.conveyor.dto.ScoringDataDTO;

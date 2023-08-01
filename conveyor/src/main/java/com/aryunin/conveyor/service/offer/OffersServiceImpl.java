@@ -1,7 +1,8 @@
-package com.aryunin.conveyor.service;
+package com.aryunin.conveyor.service.offer;
 
 import com.aryunin.conveyor.dto.LoanApplicationRequestDTO;
 import com.aryunin.conveyor.dto.LoanOfferDTO;
+import com.aryunin.conveyor.service.CreditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class OffersServiceImpl implements OffersService{
         BigDecimal monthlyPayment = creditService.getMonthlyPayment(totalAmount, rate, request.getTerm());
 
         return LoanOfferDTO.builder()
-                .applicationId(0L) // todo id
+                .applicationId(0L)
                 .requestedAmount(request.getAmount())
                 .totalAmount(totalAmount)
                 .term(request.getTerm())

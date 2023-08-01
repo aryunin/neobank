@@ -1,4 +1,4 @@
-package com.aryunin.conveyor.service;
+package com.aryunin.conveyor.service.offer;
 
 import com.aryunin.conveyor.dto.LoanApplicationRequestDTO;
 import com.aryunin.conveyor.dto.LoanOfferDTO;

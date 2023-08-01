@@ -2,7 +2,7 @@ package com.aryunin.conveyor.controller;
 
 import com.aryunin.conveyor.dto.LoanApplicationRequestDTO;
 import com.aryunin.conveyor.dto.LoanOfferDTO;
-import com.aryunin.conveyor.service.OffersService;
+import com.aryunin.conveyor.service.offer.OffersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

@@ -2,7 +2,7 @@ package com.aryunin.conveyor.controller;
 
 import com.aryunin.conveyor.dto.CreditDTO;
 import com.aryunin.conveyor.dto.ScoringDataDTO;
-import com.aryunin.conveyor.service.CalculationService;
+import com.aryunin.conveyor.service.calculation.CalculationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
