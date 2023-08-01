@@ -30,7 +30,9 @@ public class OffersService {
             boolean isInsuranceEnabled,
             boolean isSalaryClient,
             LoanApplicationRequestDTO request) {
-        BigDecimal rate = scoringService.getRate(isInsuranceEnabled, isSalaryClient);
+        BigDecimal rate = scoringService.getRate();
+        rate = scoringService.modifyRate(rate, isInsuranceEnabled, isSalaryClient);
+
         BigDecimal totalAmount = scoringService.getTotalAmount(request.getAmount(), isInsuranceEnabled);
         BigDecimal monthlyPayment = scoringService.getMonthlyPayment(totalAmount, rate, request.getTerm());
 
