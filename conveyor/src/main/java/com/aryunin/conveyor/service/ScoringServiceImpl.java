@@ -6,7 +6,6 @@ import com.aryunin.conveyor.dto.enums.EmploymentStatus;
 import com.aryunin.conveyor.dto.enums.Gender;
 import com.aryunin.conveyor.dto.enums.MaterialStatus;
 import com.aryunin.conveyor.dto.enums.Position;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +15,12 @@ import java.time.Period;
 
 //TODO логирование
 @Service
-@RequiredArgsConstructor
 public class ScoringServiceImpl implements ScoringService {
-    @Value("${credit.min-rate}")
-    private BigDecimal minRate;
+    private final BigDecimal minRate;
+
+    public ScoringServiceImpl(@Value("${credit.min-rate}") BigDecimal minRate) {
+        this.minRate = minRate;
+    }
 
     @Override
     public BigDecimal scoreRate(BigDecimal rate, ScoringDataDTO data) {
