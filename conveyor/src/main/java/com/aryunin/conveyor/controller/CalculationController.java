@@ -15,9 +15,7 @@ public class CalculationController {
 
     @PostMapping
     @ResponseBody
-    public CreditDTO getCredit(
-            @RequestBody @Valid ScoringDataDTO request
-    ) {
+    public CreditDTO getCredit(@RequestBody @Valid ScoringDataDTO request) {
         return service.getCredit(request);
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// default contextPath replaced by /api in the application.yml
 @RestController
 @RequestMapping("/offers")
 @RequiredArgsConstructor
@@ -17,9 +16,7 @@ public class OffersController {
 
     @PostMapping
     @ResponseBody
-    public List<LoanOfferDTO> getOffers(
-            @RequestBody LoanApplicationRequestDTO request
-            ) {
+    public List<LoanOfferDTO> getOffers(@RequestBody LoanApplicationRequestDTO request) {
         return service.getOffers(request);
     }
 }

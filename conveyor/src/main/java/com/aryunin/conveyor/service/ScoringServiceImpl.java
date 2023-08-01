@@ -1,69 +1,36 @@
 package com.aryunin.conveyor.service;
 
 import com.aryunin.conveyor.dto.EmploymentDTO;
+import com.aryunin.conveyor.dto.ScoringDataDTO;
 import com.aryunin.conveyor.dto.enums.EmploymentStatus;
 import com.aryunin.conveyor.dto.enums.Gender;
 import com.aryunin.conveyor.dto.enums.MaterialStatus;
 import com.aryunin.conveyor.dto.enums.Position;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 
 //TODO логирование
 @Service
+@RequiredArgsConstructor
 public class ScoringServiceImpl implements ScoringService {
-    @Value("${credit.base-rate}")
-    private BigDecimal baseRate;
-    @Value("${credit.insurance-rate}")
-    private BigDecimal insuranceRate;
-    @Value("${decimal-scaling.calculation}")
-    private int scale;
+    @Value("${credit.min-rate}")
+    private BigDecimal minRate;
 
     @Override
-    public BigDecimal getRate() {
-        return baseRate;
+    public BigDecimal scoreRate(BigDecimal rate, ScoringDataDTO data) {
+        rate = checkEmployment(rate, data.getAmount(), data.getEmployment());
+        rate = checkMaterialStatus(rate, data.getMaterialStatus());
+        rate = checkDependentAmount(rate, data.getDependentAmount());
+        rate = checkGenderAndAge(rate, data.getGender(), data.getBirthDate());
+        return (rate.compareTo(minRate) < 0) ? minRate : rate;
     }
 
-    @Override
-    public BigDecimal getInsuranceRate() {
-        return insuranceRate;
-    }
-
-    @Override
-    public BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term) {
-        var rpm = rate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
-        var x = totalAmount.multiply(rpm);
-        var y = new BigDecimal(1).add(rpm).pow(term);
-        y = new BigDecimal(1).divide(y, scale, RoundingMode.HALF_UP);
-        y = new BigDecimal(1).subtract(y);
-        return x.divide(y, scale, RoundingMode.HALF_UP);
-    }
-
-    @Override
-    public BigDecimal getInsuranceAmount(BigDecimal amount) {
-        return amount
-                .multiply(insuranceRate)
-                .divide(new BigDecimal("100"), scale, RoundingMode.HALF_UP);
-    }
-
-    @Override
-    public BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled) {
-        return (isInsuranceEnabled) ? amount.add(getInsuranceAmount(amount)) : amount;
-    }
-
-    @Override
-    public BigDecimal modifyRate(BigDecimal rate, boolean isInsuranceEnabled, boolean isSalaryClient) {
-        if(isInsuranceEnabled) rate = rate.subtract(new BigDecimal("3.0"));
-        if(isSalaryClient) rate = rate.subtract(new BigDecimal("1.0"));
-        return rate;
-    }
-
-    @Override
-    public BigDecimal modifyRate(BigDecimal rate, BigDecimal amount, EmploymentDTO employment) {
+    private BigDecimal checkEmployment(BigDecimal rate, BigDecimal amount, EmploymentDTO employment) {
         rate = checkEmploymentStatus(rate, employment.getEmploymentStatus());
         rate = checkWorkingExperience(rate, employment.getWorkExperienceCurrent(), employment.getWorkExperienceTotal());
         rate = checkSalary(rate, employment.getSalary(), amount);
@@ -71,29 +38,22 @@ public class ScoringServiceImpl implements ScoringService {
         return rate;
     }
 
-    @Override
-    public BigDecimal modifyRate(BigDecimal rate, MaterialStatus materialStatus) {
+    private BigDecimal checkMaterialStatus(BigDecimal rate, MaterialStatus materialStatus) {
         return switch (materialStatus) {
             case MARRIED -> rate.subtract(new BigDecimal(3));
             case DIVORCED -> rate.add(new BigDecimal(1));
         };
     }
 
-    @Override
-    public BigDecimal modifyRate(BigDecimal rate, Integer dependentCount) {
+    private BigDecimal checkDependentAmount(BigDecimal rate, Integer dependentCount) {
         return (dependentCount > 1) ? rate.add(new BigDecimal(1)) : rate;
     }
 
-    @Override
-    public BigDecimal modifyRate(BigDecimal rate, Gender gender, LocalDate birthDate) {
+    private BigDecimal checkGenderAndAge(BigDecimal rate, Gender gender, LocalDate birthDate) {
         int age = getAge(birthDate);
         rate = checkAge(rate, age);
         rate = checkGender(rate, gender, age);
         return rate;
-    }
-
-    private int getAge(LocalDate birthDate) {
-        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 
     private BigDecimal checkAge(BigDecimal rate, int age) {
@@ -142,5 +102,9 @@ public class ScoringServiceImpl implements ScoringService {
             case MANAGER -> rate.subtract(new BigDecimal(2));
             case TOP_MANAGER -> rate.subtract(new BigDecimal(4));
         };
+    }
+
+    private int getAge(LocalDate birthDate) {
+        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 }
