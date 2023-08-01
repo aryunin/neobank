@@ -12,18 +12,25 @@ import java.util.List;
 
 @Service
 public class CreditServiceImpl implements CreditService {
-    @Value("${credit.base-rate}")
-    private BigDecimal baseRate;
-    @Value("${credit.insurance-rate}")
-    private BigDecimal insuranceRate;
-    @Value("${decimal-scaling.calculation}")
-    private int scale;
+    private final BigDecimal baseRate;
+    private final BigDecimal insuranceRate;
+    private final int scale;
+
+    public CreditServiceImpl(
+            @Value("${credit.base-rate}") BigDecimal baseRate,
+            @Value("${credit.insurance-rate}") BigDecimal insuranceRate,
+            @Value("${decimal-scaling.calculation}") int scale) {
+        this.baseRate = baseRate;
+        this.insuranceRate = insuranceRate;
+        this.scale = scale;
+    }
 
     @Override
     public BigDecimal getRate(boolean isInsuranceEnabled, boolean isSalaryClient) {
-        if(isInsuranceEnabled) baseRate = baseRate.subtract(new BigDecimal("3.0"));
-        if(isSalaryClient) baseRate = baseRate.subtract(new BigDecimal("1.0"));
-        return baseRate;
+        BigDecimal result = new BigDecimal(baseRate.toString());
+        if(isInsuranceEnabled) result =  result.subtract(new BigDecimal("3.0"));
+        if(isSalaryClient) result = result.subtract(new BigDecimal("1.0"));
+        return result;
     }
 
     @Override
