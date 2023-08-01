@@ -53,7 +53,7 @@ public class ScoringDataDTO {
     private MaterialStatus materialStatus;
     @NotNull
     @Min(value = 0, message = "negative dependent amount")
-    private Integer dependentAmount; // fixme что это?
+    private Integer dependentAmount;
     @NotNull
     private EmploymentDTO employment;
     @NotNull
