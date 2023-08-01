@@ -13,6 +13,8 @@ public class ScoringServiceImpl implements ScoringService {
     private BigDecimal baseRate;
     @Value("${credit.insurance-rate}")
     private BigDecimal insuranceRate;
+    @Value("${decimal-scaling.calculation}")
+    private int scale;
 
     @Override
     public BigDecimal getRate() {
@@ -34,19 +36,19 @@ public class ScoringServiceImpl implements ScoringService {
 
     @Override
     public BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term) {
-        var rpm = rate.divide(new BigDecimal("1200"), rate.scale(), RoundingMode.HALF_UP);
+        var rpm = rate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
         var x = totalAmount.multiply(rpm);
         var y = new BigDecimal(1).add(rpm).pow(term);
-        y = new BigDecimal(1).divide(y, rate.scale(), RoundingMode.HALF_UP);
+        y = new BigDecimal(1).divide(y, scale, RoundingMode.HALF_UP);
         y = new BigDecimal(1).subtract(y);
-        return x.divide(y, rate.scale(), RoundingMode.HALF_UP).setScale(rate.scale(), RoundingMode.HALF_UP);
+        return x.divide(y, scale, RoundingMode.HALF_UP);
     }
 
     @Override
     public BigDecimal getInsuranceAmount(BigDecimal amount) {
         return amount
                 .multiply(insuranceRate)
-                .divide(new BigDecimal("100"), amount.scale(), RoundingMode.HALF_UP);
+                .divide(new BigDecimal("100"), scale, RoundingMode.HALF_UP);
     }
 
     @Override

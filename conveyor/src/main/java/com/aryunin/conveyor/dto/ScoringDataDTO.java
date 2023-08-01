@@ -2,7 +2,7 @@ package com.aryunin.conveyor.dto;
 
 import com.aryunin.conveyor.dto.enums.Gender;
 import com.aryunin.conveyor.dto.enums.MaterialStatus;
-import com.aryunin.conveyor.util.MoneySerializer;
+import com.aryunin.conveyor.util.DecimalSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.Min;
@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class ScoringDataDTO {
-    @JsonSerialize(using = MoneySerializer.class)
+    @JsonSerialize(using = DecimalSerializer.class)
     @NotNull
     @Min(value = 10000, message = "too small amount")
     private BigDecimal amount;
