@@ -35,14 +35,14 @@ public class OffersService {
         BigDecimal monthlyPayment = scoringService.getMonthlyPayment(totalAmount, rate, request.getTerm());
 
         return LoanOfferDTO.builder()
-                .applicationId(0L)
+                .applicationId(0L) // fixme id
                 .requestedAmount(request.getAmount())
                 .totalAmount(totalAmount)
                 .term(request.getTerm())
                 .monthlyPayment(monthlyPayment)
                 .rate(rate)
                 .isInsuranceEnabled(isInsuranceEnabled)
-                .isSalaryEnabled(isInsuranceEnabled)
+                .isSalaryEnabled(isSalaryClient)
                 .build();
     }
 }

@@ -8,4 +8,6 @@ public interface ScoringService {
     BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled);
 
     BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term);
+
+    BigDecimal getInsuranceAmount(BigDecimal baseAmount, BigDecimal insuranceRate);
 }
