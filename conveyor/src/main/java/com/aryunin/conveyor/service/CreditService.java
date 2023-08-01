@@ -12,6 +12,7 @@ public interface CreditService {
     BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term);
     BigDecimal getInsuranceAmount(BigDecimal amount);
     BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled);
+    BigDecimal getPSK(BigDecimal amount, BigDecimal monthlyPayment, Integer term);
     List<PaymentScheduleElement> getPaymentSchedule(
             LocalDate startDate,
             BigDecimal totalAmount,
