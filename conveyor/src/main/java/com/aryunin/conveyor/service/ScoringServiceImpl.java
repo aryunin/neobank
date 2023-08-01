@@ -13,7 +13,11 @@ public class ScoringServiceImpl implements ScoringService {
     private BigDecimal baseRate;
     @Value("${credit.insurance-rate}")
     private BigDecimal insuranceRate;
-    private final int scale = 16; // минимальная точность промежуточных вычислений
+
+    @Override
+    public BigDecimal getRate() {
+        return baseRate;
+    }
 
     @Override
     public BigDecimal getRate(boolean isInsuranceEnabled, boolean isSalaryClient) {
@@ -24,26 +28,29 @@ public class ScoringServiceImpl implements ScoringService {
     }
 
     @Override
-    public BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled) {
-        amount = amount.setScale(scale, RoundingMode.HALF_UP);
-        var insuranceAmount = getInsuranceAmount(amount, insuranceRate);
-        return (isInsuranceEnabled) ? amount.add(insuranceAmount) : amount;
+    public BigDecimal getInsuranceRate() {
+        return insuranceRate;
     }
 
     @Override
     public BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term) {
-        var rpm = rate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
+        var rpm = rate.divide(new BigDecimal("1200"), rate.scale(), RoundingMode.HALF_UP);
         var x = totalAmount.multiply(rpm);
         var y = new BigDecimal(1).add(rpm).pow(term);
-        y = new BigDecimal(1).divide(y, scale, RoundingMode.HALF_UP);
+        y = new BigDecimal(1).divide(y, rate.scale(), RoundingMode.HALF_UP);
         y = new BigDecimal(1).subtract(y);
-        return x.divide(y, scale, RoundingMode.HALF_UP);
+        return x.divide(y, rate.scale(), RoundingMode.HALF_UP).setScale(rate.scale(), RoundingMode.HALF_UP);
     }
 
     @Override
-    public BigDecimal getInsuranceAmount(BigDecimal baseAmount, BigDecimal insuranceRate) {
-        return baseAmount
+    public BigDecimal getInsuranceAmount(BigDecimal amount) {
+        return amount
                 .multiply(insuranceRate)
-                .divide(new BigDecimal("100"), scale, RoundingMode.HALF_UP);
+                .divide(new BigDecimal("100"), amount.scale(), RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled) {
+        return (isInsuranceEnabled) ? amount.add(getInsuranceAmount(amount)) : amount;
     }
 }

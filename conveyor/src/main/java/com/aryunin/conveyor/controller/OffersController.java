@@ -6,6 +6,7 @@ import com.aryunin.conveyor.service.OffersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.RoundingMode;
 import java.util.List;
 
 // default contextPath replaced by /api in the application.yml
@@ -14,13 +15,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OffersController {
     private final OffersService service;
+    private final int scale = 16; // fixme куда-нибудь вынести
 
     @PostMapping
     @ResponseBody
     public List<LoanOfferDTO> getOffers(
             @RequestBody LoanApplicationRequestDTO request
             ) {
-        // fixme нужна ли тут валидация?
+        upscale(request);
         return service.getOffers(request);
+    }
+
+    private void upscale(LoanApplicationRequestDTO request) {
+        request.setAmount(request.getAmount().setScale(scale, RoundingMode.HALF_UP));
     }
 }
