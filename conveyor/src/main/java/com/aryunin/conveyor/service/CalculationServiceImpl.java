@@ -5,7 +5,6 @@ import com.aryunin.conveyor.dto.ScoringDataDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Service
@@ -27,13 +26,14 @@ public class CalculationServiceImpl implements CalculationService{
                 rate,
                 data.getTerm()
         );
+        var psk = creditService.getPSK(totalAmount, monthlyPayment, data.getTerm());
 
         return CreditDTO.builder()
                 .amount(totalAmount)
                 .term(data.getTerm())
                 .monthlyPayment(monthlyPayment)
                 .rate(rate)
-                .psk(new BigDecimal(1)) // TODO psk
+                .psk(psk) // TODO psk
                 .isInsuranceEnabled(data.getIsInsuranceEnabled())
                 .isSalaryClient(data.getIsSalaryClient())
                 .paymentSchedule(paymentSchedule)

@@ -49,6 +49,13 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Override
+    public BigDecimal getPSK(BigDecimal amount, BigDecimal monthlyPayment, Integer term) {
+        var fullPayment = monthlyPayment.multiply(new BigDecimal(term));
+        var diff = fullPayment.subtract(amount);
+        return diff.divide(amount, scale, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
+    }
+
+    @Override
     public List<PaymentScheduleElement> getPaymentSchedule(
             LocalDate startDate,
             BigDecimal totalAmount,

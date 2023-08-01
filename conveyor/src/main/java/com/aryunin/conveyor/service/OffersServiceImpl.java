@@ -36,7 +36,7 @@ public class OffersServiceImpl implements OffersService{
         BigDecimal monthlyPayment = creditService.getMonthlyPayment(totalAmount, rate, request.getTerm());
 
         return LoanOfferDTO.builder()
-                .applicationId(0L) // fixme id
+                .applicationId(0L) // todo id
                 .requestedAmount(request.getAmount())
                 .totalAmount(totalAmount)
                 .term(request.getTerm())
