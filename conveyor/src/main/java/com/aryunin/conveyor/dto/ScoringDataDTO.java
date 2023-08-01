@@ -14,6 +14,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+// TODO default notnull message
 @Data
 @Builder
 public class ScoringDataDTO {
