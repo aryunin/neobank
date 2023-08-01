@@ -1,10 +1,14 @@
 package com.aryunin.conveyor.service;
 
+import com.aryunin.conveyor.dto.PaymentScheduleElement;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CreditServiceImpl implements CreditService {
@@ -24,7 +28,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public BigDecimal getMonthlyPayment(BigDecimal totalAmount, BigDecimal rate, Integer term) {
-        var rpm = rate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
+        var rpm = getNormalRate(rate);
         var x = totalAmount.multiply(rpm);
         var y = new BigDecimal(1).add(rpm).pow(term);
         y = new BigDecimal(1).divide(y, scale, RoundingMode.HALF_UP);
@@ -42,5 +46,43 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled) {
         return (isInsuranceEnabled) ? amount.add(getInsuranceAmount(amount)) : amount;
+    }
+
+    @Override
+    public List<PaymentScheduleElement> getPaymentSchedule(
+            LocalDate startDate,
+            BigDecimal totalAmount,
+            BigDecimal rate,
+            Integer term) {
+        var result = new ArrayList<PaymentScheduleElement>();
+        var remainingDebt = totalAmount;
+        var currentDate = startDate;
+        var monthlyPayment = getMonthlyPayment(totalAmount, rate, term);
+        var normalRate = getNormalRate(rate);
+
+        for(var i = 0; i < term; i++) {
+            var interestPayment = remainingDebt.multiply(normalRate);
+            var debtPayment = monthlyPayment.subtract(interestPayment);
+            remainingDebt = remainingDebt.subtract(debtPayment);
+
+            result.add(
+                    PaymentScheduleElement.builder()
+                    .number(i + 1)
+                    .date(currentDate)
+                    .totalPayment(monthlyPayment)
+                    .debtPayment(debtPayment)
+                    .interestPayment(interestPayment)
+                    .remainingDebt(remainingDebt)
+                    .build()
+            );
+
+            currentDate = currentDate.plusMonths(1L);
+        }
+
+        return result;
+    }
+
+    private BigDecimal getNormalRate(BigDecimal percentRate) {
+        return percentRate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
     }
 }

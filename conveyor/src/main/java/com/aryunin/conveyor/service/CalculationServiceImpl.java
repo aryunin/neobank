@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Collections;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -16,11 +16,17 @@ public class CalculationServiceImpl implements CalculationService{
 
     @Override
     public CreditDTO getCredit(ScoringDataDTO data) {
-        BigDecimal rate = creditService.getRate(data.getIsInsuranceEnabled(), data.getIsSalaryClient());
+        var rate = creditService.getRate(data.getIsInsuranceEnabled(), data.getIsSalaryClient());
         rate = scoringService.scoreRate(rate, data);
 
-        BigDecimal totalAmount = creditService.getTotalAmount(data.getAmount(), data.getIsInsuranceEnabled());
-        BigDecimal monthlyPayment = creditService.getMonthlyPayment(totalAmount, rate, data.getTerm());
+        var totalAmount = creditService.getTotalAmount(data.getAmount(), data.getIsInsuranceEnabled());
+        var monthlyPayment = creditService.getMonthlyPayment(totalAmount, rate, data.getTerm());
+        var paymentSchedule = creditService.getPaymentSchedule(
+                LocalDate.now(),
+                totalAmount,
+                rate,
+                data.getTerm()
+        );
 
         return CreditDTO.builder()
                 .amount(totalAmount)
@@ -30,7 +36,7 @@ public class CalculationServiceImpl implements CalculationService{
                 .psk(new BigDecimal(1)) // TODO psk
                 .isInsuranceEnabled(data.getIsInsuranceEnabled())
                 .isSalaryClient(data.getIsSalaryClient())
-                .paymentSchedule(Collections.emptyList()) // TODO paymentSchedule
+                .paymentSchedule(paymentSchedule)
                 .build();
     }
 }
