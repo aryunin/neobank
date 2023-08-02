@@ -1,3 +1,12 @@
+credit:
+  base-rate: 9.5
+  insurance-rate: 6.0
+  min-rate: 3.0
+
+decimal-scaling:
+  calculation: 16
+  serialization: 2
+
 server:
   port: 8080
   servlet:

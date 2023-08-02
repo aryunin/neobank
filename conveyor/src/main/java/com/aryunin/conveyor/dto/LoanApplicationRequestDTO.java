@@ -1,6 +1,6 @@
 package com.aryunin.conveyor.dto;
 
-import com.aryunin.conveyor.util.MoneySerializer;
+import com.aryunin.conveyor.util.DecimalSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class LoanApplicationRequestDTO{
-    @JsonSerialize(using = MoneySerializer.class)
+    @JsonSerialize(using = DecimalSerializer.class)
     private BigDecimal amount;
     private Integer term;
     private String firstName;
