@@ -3,6 +3,7 @@ package com.aryunin.conveyor.dto;
 import com.aryunin.conveyor.dto.enums.Gender;
 import com.aryunin.conveyor.dto.enums.MaterialStatus;
 import com.aryunin.conveyor.util.DecimalSerializer;
+import com.aryunin.conveyor.validation.DateInPast;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.Min;
@@ -36,6 +37,7 @@ public class ScoringDataDTO {
     private Gender gender;
     @JsonFormat(pattern="yyyy-MM-dd")
     @NotNull(message = "field must not be null")
+    @DateInPast(message = "the date must be in the past")
     private LocalDate birthDate;
     @NotNull(message = "field must not be null")
     @Pattern(regexp = "\\d{4}")
@@ -44,7 +46,8 @@ public class ScoringDataDTO {
     @Pattern(regexp = "\\d{6}")
     private String passportNumber;
     @JsonFormat(pattern="yyyy-MM-dd")
-    @NotNull(message = "field must not be null") // TODO VALIDATE!!!
+    @NotNull(message = "field must not be null")
+    @DateInPast(message = "the date must be in the past")
     private LocalDate passportIssueDate;
     @NotNull(message = "field must not be null")
     @Pattern(regexp = "\\d{3}-\\d{3}", message = "invalid passport issue branch format")
