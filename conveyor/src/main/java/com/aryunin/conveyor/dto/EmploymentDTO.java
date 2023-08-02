@@ -1,7 +1,7 @@
 package com.aryunin.conveyor.dto;
 
-import com.aryunin.conveyor.dto.enums.EmploymentStatus;
 import com.aryunin.conveyor.util.DecimalSerializer;
+import com.aryunin.conveyor.dto.enums.EmploymentStatus;
 import com.aryunin.conveyor.dto.enums.Position;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.Min;
