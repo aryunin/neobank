@@ -1,6 +1,7 @@
 package com.aryunin.conveyor.util;
 
 import com.aryunin.conveyor.dto.PaymentScheduleElement;
+import com.aryunin.conveyor.exception.MathException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,11 @@ public class CreditUtils {
 
         if(rate.compareTo(new BigDecimal(0)) <= 0) {
             log.info("non-positive rate, throwing exception");
-            throw new RuntimeException("non-positive rate");
+            throw new MathException("non-positive rate");
+        }
+        if(term == 0) {
+            log.info("zero term, throwing exception");
+            throw new MathException("zero term");
         }
 
         var rpm = getNormalRate(rate);
@@ -49,9 +54,13 @@ public class CreditUtils {
     public BigDecimal getPSK(BigDecimal amount, BigDecimal monthlyPayment, Integer term) {
         log.info("getPSK(...)");
 
-        if(amount.equals(new BigDecimal(0)) || term == 0) {
+        if(amount.equals(new BigDecimal(0)) ) {
             log.info("non-positive amount, throwing exception");
-            throw new RuntimeException("non-positive amount");
+            throw new MathException("non-positive amount");
+        }
+        if(term == 0) {
+            log.info("zero term, throwing exception");
+            throw new MathException("zero term");
         }
 
         var fullPayment = monthlyPayment.multiply(new BigDecimal(term));
