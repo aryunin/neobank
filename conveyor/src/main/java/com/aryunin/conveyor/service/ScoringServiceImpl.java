@@ -121,7 +121,7 @@ public class ScoringServiceImpl implements ScoringService {
     private static BigDecimal checkEmploymentStatus(BigDecimal rate, EmploymentStatus employmentStatus) {
         log.info("checking employment status");
         return switch (employmentStatus) {
-            case UNEMPLOYED -> throw new RuntimeException("Inappropriate employment status.");
+            case UNEMPLOYED -> throw new ScoringFailedException("Inappropriate employment status.");
             case EMPLOYED -> rate;
             case SELF_EMPLOYED -> rate.add(new BigDecimal(1));
             case BUSINESSMAN -> rate.add(new BigDecimal(3));
@@ -131,10 +131,10 @@ public class ScoringServiceImpl implements ScoringService {
     private static BigDecimal checkWorkingExperience(BigDecimal rate, Integer current, Integer total) {
         log.info("checking working experience");
         if(current < 3)
-            throw new RuntimeException("Too little current work experience.");
+            throw new ScoringFailedException("Too little current work experience.");
 
         if(total < 12)
-            throw new RuntimeException("Too little total work experience.");
+            throw new ScoringFailedException("Too little total work experience.");
 
         return rate;
     }
@@ -142,7 +142,7 @@ public class ScoringServiceImpl implements ScoringService {
     private static BigDecimal checkSalary(BigDecimal rate, BigDecimal salary, BigDecimal amount) {
         log.info("checking salary");
         if(amount.compareTo(salary.multiply(new BigDecimal(20))) > 0)
-            throw new RuntimeException("Too small salary.");
+            throw new ScoringFailedException("Too small salary.");
 
         return rate;
     }

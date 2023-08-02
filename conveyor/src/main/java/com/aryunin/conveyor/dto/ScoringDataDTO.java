@@ -40,10 +40,10 @@ public class ScoringDataDTO {
     @DateInPast(message = "the date must be in the past")
     private LocalDate birthDate;
     @NotNull(message = "field must not be null")
-    @Pattern(regexp = "\\d{4}")
+    @Pattern(regexp = "\\d{4}", message = "invalid passport series format")
     private String passportSeries;
     @NotNull(message = "field must not be null")
-    @Pattern(regexp = "\\d{6}")
+    @Pattern(regexp = "\\d{6}", message = "invalid passport number format")
     private String passportNumber;
     @JsonFormat(pattern="yyyy-MM-dd")
     @NotNull(message = "field must not be null")
@@ -60,7 +60,7 @@ public class ScoringDataDTO {
     @NotNull(message = "field must not be null")
     private EmploymentDTO employment;
     @NotNull(message = "field must not be null")
-    @Pattern(regexp = "\\d{20}")
+    @Pattern(regexp = "\\d{20}", message = "invalid account format")
     private String account;
     @NotNull(message = "field must not be null")
     private Boolean isInsuranceEnabled;
