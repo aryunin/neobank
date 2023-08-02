@@ -15,21 +15,21 @@ import java.math.BigDecimal;
 @Data
 @Builder
 public class EmploymentDTO {
-    @NotNull
+    @NotNull(message = "field must not be null")
     private EmploymentStatus employmentStatus;
-    @NotNull
+    @NotNull(message = "field must not be null")
     @Pattern(regexp = "\\d{20}")
     private String employerINN;
     @JsonSerialize(using = DecimalSerializer.class)
-    @NotNull
+    @NotNull(message = "field must not be null")
     @Min(value = 0, message = "negative salary")
     private BigDecimal salary;
-    @NotNull
+    @NotNull(message = "field must not be null")
     private Position position;
-    @NotNull
+    @NotNull(message = "field must not be null")
     @Min(value = 0, message = "negative total work experience")
     private Integer workExperienceTotal;
-    @NotNull
+    @NotNull(message = "field must not be null")
     @Min(value = 0, message = "negative work experience")
     private Integer workExperienceCurrent;
 }
