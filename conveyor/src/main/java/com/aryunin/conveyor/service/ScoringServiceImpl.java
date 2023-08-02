@@ -1,4 +1,4 @@
-package com.aryunin.conveyor.service.calculation;
+package com.aryunin.conveyor.service;
 
 import com.aryunin.conveyor.dto.EmploymentDTO;
 import com.aryunin.conveyor.dto.ScoringDataDTO;
@@ -16,14 +16,20 @@ import java.time.Period;
 //TODO логирование
 @Service
 public class ScoringServiceImpl implements ScoringService {
+    private final BigDecimal baseRate;
     private final BigDecimal minRate;
 
-    public ScoringServiceImpl(@Value("${credit.min-rate}") BigDecimal minRate) {
+    public ScoringServiceImpl(
+            @Value("${credit.base-rate}") BigDecimal baseRate,
+            @Value("${credit.min-rate}") BigDecimal minRate
+    ) {
+        this.baseRate = baseRate;
         this.minRate = minRate;
     }
 
     @Override
-    public BigDecimal scoreRate(BigDecimal rate, ScoringDataDTO data) {
+    public BigDecimal getRate(ScoringDataDTO data) {
+        BigDecimal rate = getRate(data.getIsInsuranceEnabled(), data.getIsSalaryClient());
         rate = checkEmployment(rate, data.getAmount(), data.getEmployment());
         rate = checkMaterialStatus(rate, data.getMaterialStatus());
         rate = checkDependentAmount(rate, data.getDependentAmount());
@@ -31,7 +37,15 @@ public class ScoringServiceImpl implements ScoringService {
         return (rate.compareTo(minRate) < 0) ? minRate : rate;
     }
 
-    private BigDecimal checkEmployment(BigDecimal rate, BigDecimal amount, EmploymentDTO employment) {
+    @Override
+    public BigDecimal getRate(boolean isInsuranceEnabled, boolean isSalaryClient) {
+        var rate = new BigDecimal(baseRate.toString());
+        rate = checkInsurance(rate, isInsuranceEnabled);
+        rate = checkSalaryClient(rate, isSalaryClient);
+        return rate;
+    }
+
+    private static BigDecimal checkEmployment(BigDecimal rate, BigDecimal amount, EmploymentDTO employment) {
         rate = checkEmploymentStatus(rate, employment.getEmploymentStatus());
         rate = checkWorkingExperience(rate, employment.getWorkExperienceCurrent(), employment.getWorkExperienceTotal());
         rate = checkSalary(rate, employment.getSalary(), amount);
@@ -39,31 +53,39 @@ public class ScoringServiceImpl implements ScoringService {
         return rate;
     }
 
-    private BigDecimal checkMaterialStatus(BigDecimal rate, MaterialStatus materialStatus) {
+    private static BigDecimal checkInsurance(BigDecimal rate, boolean isInsuranceEnabled) {
+        return (isInsuranceEnabled) ? rate.subtract(new BigDecimal(3)) : rate;
+    }
+
+    private static BigDecimal checkSalaryClient(BigDecimal rate, boolean isSalaryClient) {
+        return (isSalaryClient) ? rate.subtract(new BigDecimal(1)) : rate;
+    }
+
+    private static BigDecimal checkMaterialStatus(BigDecimal rate, MaterialStatus materialStatus) {
         return switch (materialStatus) {
             case MARRIED -> rate.subtract(new BigDecimal(3));
             case DIVORCED -> rate.add(new BigDecimal(1));
         };
     }
 
-    private BigDecimal checkDependentAmount(BigDecimal rate, Integer dependentCount) {
+    private static BigDecimal checkDependentAmount(BigDecimal rate, Integer dependentCount) {
         return (dependentCount > 1) ? rate.add(new BigDecimal(1)) : rate;
     }
 
-    private BigDecimal checkGenderAndAge(BigDecimal rate, Gender gender, LocalDate birthDate) {
-        int age = getAge(birthDate);
+    private static BigDecimal checkGenderAndAge(BigDecimal rate, Gender gender, LocalDate birthDate) {
+        int age = Period.between(birthDate, LocalDate.now()).getYears();
         rate = checkAge(rate, age);
         rate = checkGender(rate, gender, age);
         return rate;
     }
 
-    private BigDecimal checkAge(BigDecimal rate, int age) {
+    private static BigDecimal checkAge(BigDecimal rate, int age) {
         if (age < 20 || age > 60)
             throw new RuntimeException(""); // TODO exc
         return rate;
     }
 
-    private BigDecimal checkGender(BigDecimal rate, Gender gender, int age) {
+    private static BigDecimal checkGender(BigDecimal rate, Gender gender, int age) {
         return switch (gender) {
             case MALE -> (age >= 30 && age <= 55) ? rate.subtract(new BigDecimal(3)) : rate;
             case FEMALE -> (age >= 35 && age <= 60) ? rate.subtract(new BigDecimal(3)) : rate;
@@ -71,7 +93,7 @@ public class ScoringServiceImpl implements ScoringService {
         };
     }
 
-    private BigDecimal checkEmploymentStatus(BigDecimal rate, EmploymentStatus employmentStatus) {
+    private static BigDecimal checkEmploymentStatus(BigDecimal rate, EmploymentStatus employmentStatus) {
         return switch (employmentStatus) {
             case UNEMPLOYED -> throw new RuntimeException(""); // TODO exc
             case EMPLOYED -> rate;
@@ -80,7 +102,7 @@ public class ScoringServiceImpl implements ScoringService {
         };
     }
 
-    private BigDecimal checkWorkingExperience(BigDecimal rate, Integer current, Integer total) {
+    private static BigDecimal checkWorkingExperience(BigDecimal rate, Integer current, Integer total) {
         if(current < 3)
             throw new RuntimeException(""); // TODO exc
 
@@ -90,22 +112,18 @@ public class ScoringServiceImpl implements ScoringService {
         return rate;
     }
 
-    private BigDecimal checkSalary(BigDecimal rate, BigDecimal salary, BigDecimal amount) {
+    private static BigDecimal checkSalary(BigDecimal rate, BigDecimal salary, BigDecimal amount) {
         if(amount.compareTo(salary.multiply(new BigDecimal(20))) > 0)
             throw new RuntimeException(""); // TODO exc
 
         return rate;
     }
 
-    private BigDecimal checkPosition(BigDecimal rate, Position position) {
+    private static BigDecimal checkPosition(BigDecimal rate, Position position) {
         return switch (position) {
             case WORKER -> rate;
             case MANAGER -> rate.subtract(new BigDecimal(2));
             case TOP_MANAGER -> rate.subtract(new BigDecimal(4));
         };
-    }
-
-    private int getAge(LocalDate birthDate) {
-        return Period.between(birthDate, LocalDate.now()).getYears();
     }
 }

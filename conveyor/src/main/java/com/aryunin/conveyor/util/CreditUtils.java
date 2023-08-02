@@ -1,8 +1,8 @@
-package com.aryunin.conveyor.service;
+package com.aryunin.conveyor.util;
 
 import com.aryunin.conveyor.dto.PaymentScheduleElement;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,52 +10,38 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class CreditServiceImpl implements CreditService {
-    private final BigDecimal baseRate;
+@Component
+public class CreditUtils {
     private final BigDecimal insuranceRate;
-    private final int scale;
+    private final int decimalScale;
 
-    public CreditServiceImpl(
-            @Value("${credit.base-rate}") BigDecimal baseRate,
+    public CreditUtils(
             @Value("${credit.insurance-rate}") BigDecimal insuranceRate,
-            @Value("${decimal-scaling.calculation}") int scale) {
-        this.baseRate = baseRate;
+            @Value("${decimal-scaling.calculation}") int scale
+    ) {
         this.insuranceRate = insuranceRate;
-        this.scale = scale;
+        this.decimalScale = scale;
     }
 
-    @Override
-    public BigDecimal getRate(boolean isInsuranceEnabled, boolean isSalaryClient) {
-        var result = new BigDecimal(baseRate.toString());
-        if(isInsuranceEnabled) result =  result.subtract(new BigDecimal("3.0"));
-        if(isSalaryClient) result = result.subtract(new BigDecimal("1.0"));
-        return result;
-    }
-
-    @Override
     public BigDecimal getMonthlyPayment(BigDecimal amount, BigDecimal rate, Integer term) {
         var rpm = getNormalRate(rate);
         var x = amount.multiply(rpm);
         var y = new BigDecimal(1).add(rpm).pow(term);
-        y = new BigDecimal(1).divide(y, scale, RoundingMode.HALF_UP);
+        y = new BigDecimal(1).divide(y, decimalScale, RoundingMode.HALF_UP);
         y = new BigDecimal(1).subtract(y);
-        return x.divide(y, scale, RoundingMode.HALF_UP);
+        return x.divide(y, decimalScale, RoundingMode.HALF_UP);
     }
 
-    @Override
     public BigDecimal getTotalAmount(BigDecimal amount, boolean isInsuranceEnabled) {
         return (isInsuranceEnabled) ? amount.add(getInsuranceAmount(amount)) : amount;
     }
 
-    @Override
     public BigDecimal getPSK(BigDecimal amount, BigDecimal monthlyPayment, Integer term) {
         var fullPayment = monthlyPayment.multiply(new BigDecimal(term));
         var diff = fullPayment.subtract(amount);
-        return diff.divide(amount, scale, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
+        return diff.divide(amount, decimalScale, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
     }
 
-    @Override
     public List<PaymentScheduleElement> getPaymentSchedule(
             LocalDate startDate,
             BigDecimal amount,
@@ -74,13 +60,13 @@ public class CreditServiceImpl implements CreditService {
 
             result.add(
                     PaymentScheduleElement.builder()
-                    .number(i + 1)
-                    .date(currentDate)
-                    .totalPayment(monthlyPayment)
-                    .debtPayment(debtPayment)
-                    .interestPayment(interestPayment)
-                    .remainingDebt(remainingDebt)
-                    .build()
+                            .number(i + 1)
+                            .date(currentDate)
+                            .totalPayment(monthlyPayment)
+                            .debtPayment(debtPayment)
+                            .interestPayment(interestPayment)
+                            .remainingDebt(remainingDebt)
+                            .build()
             );
 
             currentDate = currentDate.plusMonths(1L);
@@ -90,12 +76,12 @@ public class CreditServiceImpl implements CreditService {
     }
 
     private BigDecimal getNormalRate(BigDecimal percentRate) {
-        return percentRate.divide(new BigDecimal("1200"), scale, RoundingMode.HALF_UP);
+        return percentRate.divide(new BigDecimal("1200"), decimalScale, RoundingMode.HALF_UP);
     }
 
     private BigDecimal getInsuranceAmount(BigDecimal amount) {
         return amount
                 .multiply(insuranceRate)
-                .divide(new BigDecimal("100"), scale, RoundingMode.HALF_UP);
+                .divide(new BigDecimal("100"), decimalScale, RoundingMode.HALF_UP);
     }
 }

@@ -2,7 +2,8 @@ package com.aryunin.conveyor.service.offer;
 
 import com.aryunin.conveyor.dto.LoanApplicationRequestDTO;
 import com.aryunin.conveyor.dto.LoanOfferDTO;
-import com.aryunin.conveyor.service.CreditService;
+import com.aryunin.conveyor.service.ScoringService;
+import com.aryunin.conveyor.util.CreditUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class OffersServiceImpl implements OffersService{
-    private final CreditService creditService;
+    private final ScoringService scoringService;
+    private final CreditUtils creditUtils;
 
     @Override
     public List<LoanOfferDTO> getOffers(LoanApplicationRequestDTO request) {
@@ -32,9 +34,10 @@ public class OffersServiceImpl implements OffersService{
             boolean isInsuranceEnabled,
             boolean isSalaryClient,
             LoanApplicationRequestDTO request) {
-        BigDecimal rate = creditService.getRate(isInsuranceEnabled, isSalaryClient);
-        BigDecimal totalAmount = creditService.getTotalAmount(request.getAmount(), isInsuranceEnabled);
-        BigDecimal monthlyPayment = creditService.getMonthlyPayment(totalAmount, rate, request.getTerm());
+        BigDecimal rate = scoringService.getRate(isInsuranceEnabled, isSalaryClient);
+
+        BigDecimal totalAmount = creditUtils.getTotalAmount(request.getAmount(), isInsuranceEnabled);
+        BigDecimal monthlyPayment = creditUtils.getMonthlyPayment(totalAmount, rate, request.getTerm());
 
         return LoanOfferDTO.builder()
                 .applicationId(0L)
