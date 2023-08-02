@@ -1,6 +1,7 @@
 package com.aryunin.conveyor.util;
 
 import com.aryunin.conveyor.dto.PaymentScheduleElement;
+import com.aryunin.conveyor.exception.MathException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -28,13 +29,15 @@ class CreditUtilsTest {
     @Test
     void getMonthlyPayment_throws() {
         var amount = new BigDecimal("100000");
-        var term = 16;
 
-        assertThrows(RuntimeException.class,
-                () -> creditUtils.getMonthlyPayment(amount, new BigDecimal("0"), term)
+        assertThrows(MathException.class,
+                () -> creditUtils.getMonthlyPayment(amount, new BigDecimal("0"), 16)
         );
-        assertThrows(RuntimeException.class,
-                () -> creditUtils.getMonthlyPayment(amount, new BigDecimal("-1"), term)
+        assertThrows(MathException.class,
+                () -> creditUtils.getMonthlyPayment(amount, new BigDecimal("-1"), 16)
+        );
+        assertThrows(MathException.class,
+                () -> creditUtils.getMonthlyPayment(amount, new BigDecimal("-1"), 0)
         );
     }
 
@@ -70,11 +73,11 @@ class CreditUtilsTest {
     void getPSK_throws() {
         var monthlyPayment = new BigDecimal("1");
 
-        assertThrows(RuntimeException.class,
+        assertThrows(MathException.class,
                 () -> creditUtils.getPSK(new BigDecimal("0"), monthlyPayment, 1)
         );
 
-        assertThrows(RuntimeException.class,
+        assertThrows(MathException.class,
                 () -> creditUtils.getPSK(new BigDecimal("1"), monthlyPayment, 0)
         );
     }
