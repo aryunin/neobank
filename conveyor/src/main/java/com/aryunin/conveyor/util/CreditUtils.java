@@ -27,6 +27,12 @@ public class CreditUtils {
 
     public BigDecimal getMonthlyPayment(BigDecimal amount, BigDecimal rate, Integer term) {
         log.info("getMothlyPayment(...)");
+
+        if(rate.compareTo(new BigDecimal(0)) <= 0) {
+            log.info("non-positive rate, throwing exception");
+            throw new RuntimeException("non-positive rate");
+        }
+
         var rpm = getNormalRate(rate);
         var x = amount.multiply(rpm);
         var y = new BigDecimal(1).add(rpm).pow(term);
@@ -42,9 +48,17 @@ public class CreditUtils {
 
     public BigDecimal getPSK(BigDecimal amount, BigDecimal monthlyPayment, Integer term) {
         log.info("getPSK(...)");
+
+        if(amount.equals(new BigDecimal(0)) || term == 0) {
+            log.info("non-positive amount, throwing exception");
+            throw new RuntimeException("non-positive amount");
+        }
+
         var fullPayment = monthlyPayment.multiply(new BigDecimal(term));
-        var diff = fullPayment.subtract(amount);
-        return diff.divide(amount, decimalScale, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
+        var x = fullPayment.divide(amount, decimalScale, RoundingMode.HALF_UP);
+        var numerator = x.subtract(new BigDecimal("1")).multiply(new BigDecimal("100"));
+        var denominator = term / 12.0;
+        return numerator.divide(new BigDecimal(denominator), decimalScale, RoundingMode.HALF_UP);
     }
 
     public List<PaymentScheduleElement> getPaymentSchedule(
