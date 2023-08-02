@@ -6,6 +6,7 @@ import com.aryunin.conveyor.dto.enums.EmploymentStatus;
 import com.aryunin.conveyor.dto.enums.Gender;
 import com.aryunin.conveyor.dto.enums.MaterialStatus;
 import com.aryunin.conveyor.dto.enums.Position;
+import com.aryunin.conveyor.exception.ScoringFailedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +82,7 @@ public class ScoringServiceImpl implements ScoringService {
 
     private static BigDecimal checkAge(BigDecimal rate, int age) {
         if (age < 20 || age > 60)
-            throw new RuntimeException(""); // TODO exc
+            throw new ScoringFailedException("Inappropriate age.");
         return rate;
     }
 
@@ -95,7 +96,7 @@ public class ScoringServiceImpl implements ScoringService {
 
     private static BigDecimal checkEmploymentStatus(BigDecimal rate, EmploymentStatus employmentStatus) {
         return switch (employmentStatus) {
-            case UNEMPLOYED -> throw new RuntimeException(""); // TODO exc
+            case UNEMPLOYED -> throw new RuntimeException("Inappropriate employment status.");
             case EMPLOYED -> rate;
             case SELF_EMPLOYED -> rate.add(new BigDecimal(1));
             case BUSINESSMAN -> rate.add(new BigDecimal(3));
@@ -104,17 +105,17 @@ public class ScoringServiceImpl implements ScoringService {
 
     private static BigDecimal checkWorkingExperience(BigDecimal rate, Integer current, Integer total) {
         if(current < 3)
-            throw new RuntimeException(""); // TODO exc
+            throw new RuntimeException("Too little current work experience.");
 
         if(total < 12)
-            throw new RuntimeException(""); // TODO exc
+            throw new RuntimeException("Too little total work experience.");
 
         return rate;
     }
 
     private static BigDecimal checkSalary(BigDecimal rate, BigDecimal salary, BigDecimal amount) {
         if(amount.compareTo(salary.multiply(new BigDecimal(20))) > 0)
-            throw new RuntimeException(""); // TODO exc
+            throw new RuntimeException("Too small salary.");
 
         return rate;
     }
