@@ -17,9 +17,9 @@ public class CalculationController {
 
     @PostMapping
     public CreditDTO getCredit(@RequestBody @Valid ScoringDataDTO request) {
-        log.info("processing loan for " + request.getLastName() + " " + request.getFirstName());
+        log.info("processing credit for " + request.getLastName() + " " + request.getFirstName());
         var result = service.getCredit(request);
-        log.info("loan offered to " + request.getLastName() + " " + request.getFirstName());
+        log.info("credit offered to " + request.getLastName() + " " + request.getFirstName());
         return result;
     }
 }
